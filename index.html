@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tigress Diary</title>
+
+  <!-- Install as an app (tablet / phone) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#3f0d21">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Diary">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts load in the background, so the page never waits for them -->
+  <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=DM+Sans:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"></noscript>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- Lock screen (shown when a password is set) -->
+  <div class="lock" id="lockScreen" hidden>
+    <form class="lock-card" id="lockForm">
+      <div class="lock-emoji" aria-hidden="true">🐯</div>
+      <h2>Tigress Diary</h2>
+      <p>Enter your password to open your diary.</p>
+      <input type="password" id="lockInput" placeholder="Password" autocomplete="current-password" aria-label="Password">
+      <p class="form-error" id="lockError" role="alert"></p>
+      <button type="submit" class="btn-solid" id="lockBtn">Unlock</button>
+      <button type="button" class="btn-link" id="forgotBtn">Forgot password?</button>
+    </form>
+  </div>
+
+  <div class="app">
+    <!-- Sidebar: all pages -->
+    <aside class="sidebar" id="sidebar" aria-label="Your diary pages">
+      <div class="brand">
+        <span class="brand-emoji" aria-hidden="true">🐯</span>
+        <h1>Tigress Diary</h1>
+      </div>
+
+      <button class="btn btn-new" id="newBtn" type="button">New page</button>
+      <input class="search" id="search" type="search" placeholder="Search your pages" aria-label="Search pages">
+
+      <ul class="entry-list" id="entryList"></ul>
+
+      <div class="sidebar-foot">
+        <button class="foot-btn" id="pwBtn" type="button">🔒 Set password</button>
+        <button class="foot-btn" id="lockNowBtn" type="button" hidden>Lock now</button>
+      </div>
+    </aside>
+
+    <!-- Main: the open page -->
+    <main class="stage">
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Open pages list">☰ Pages</button>
+
+      <article class="page" id="page">
+        <header class="page-head">
+          <div class="date-block">
+            <h2 id="prettyDate">Today</h2>
+            <label class="date-pick">
+              <span>Change date</span>
+              <input type="date" id="dateInput">
+            </label>
+          </div>
+
+          <div class="moods" id="moods" role="group" aria-label="Mood of the day"></div>
+        </header>
+
+        <input class="title" id="title" type="text" placeholder="Give today a title…" maxlength="80" aria-label="Page title">
+
+        <div class="page-body" id="pageBody">
+          <textarea id="text" class="lined" placeholder="Dear diary…" aria-label="Diary text"></textarea>
+          <div class="sticker-layer" id="stickerLayer"></div>
+        </div>
+
+        <footer class="page-foot">
+          <span id="wordCount">0 words</span>
+          <span id="status" class="status">Saved</span>
+          <button class="btn-link" id="deleteBtn" type="button">Delete page</button>
+        </footer>
+      </article>
+
+      <section class="tray" aria-label="Stickers">
+        <h3>Stickers</h3>
+        <div class="tray-grid" id="trayGrid"></div>
+
+        <div class="sticker-tools" id="stickerTools" hidden>
+          <span class="tools-label">Selected sticker</span>
+          <button type="button" data-act="smaller" aria-label="Make smaller">−</button>
+          <button type="button" data-act="bigger" aria-label="Make bigger">+</button>
+          <button type="button" data-act="rotL" aria-label="Rotate left">↺</button>
+          <button type="button" data-act="rotR" aria-label="Rotate right">↻</button>
+          <button type="button" data-act="remove" class="danger">Remove</button>
+        </div>
+        <p class="hint">Tap a sticker to add it, then drag it anywhere on your page.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Set / change / remove password -->
+  <dialog class="dialog" id="pwDialog" aria-labelledby="pwTitle">
+    <form class="dialog-body" id="pwForm" autocomplete="off">
+      <h3 id="pwTitle">Set a password</h3>
+      <p class="dialog-note">Your pages get encrypted on this device. If you forget the password, there is no way to get them back, so pick one you'll remember.</p>
+
+      <label>New password
+        <input type="password" id="pwNew" autocomplete="new-password">
+      </label>
+      <label>Confirm password
+        <input type="password" id="pwConfirm" autocomplete="new-password">
+      </label>
+
+      <p class="form-error" id="pwError" role="alert"></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn-link danger-link" id="pwRemove" hidden>Remove password</button>
+        <button type="button" class="btn-ghost" id="pwCancel">Cancel</button>
+        <button type="submit" class="btn-solid" id="pwSave">Save password</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
